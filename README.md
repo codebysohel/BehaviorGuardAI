@@ -1,5 +1,15 @@
 # 🛡️ BehaviorGuard AI: Web App & Risk Scoring Engine
+<div align="center">
 
+
+**Advanced ML-Based Risk Scoring & Web Application Framework**
+
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg) ![Security](https://img.shields.io/badge/Security-Advanced-red.svg) ![Modules](https://img.shields.io/badge/Modules-2-purple.svg) ![License](https://img.shields.io/badge/License-MIT-green.svg) ![Status](https://img.shields.io/badge/Status-Active-cyan.svg)
+
+A dual-component intelligence system evaluating user behavior sessions.
+Automates risk scoring using machine learning (Isolation Forest & Autoencoder).
+
+</div>
 BehaviorGuard AI is a two-part system designed to analyze user behavior sessions and score them for risk using machine learning. 
 
 This project consists of:
@@ -7,6 +17,53 @@ This project consists of:
 2. **The Web Application (Frontend):** A Python-based application that interfaces with the user, collects data, interacts with a database, and queries the Risk Engine for decision-making.
 
 ---
+
+
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# 1. Set Up a Virtual Environment (Recommended)
+# Navigate to your project folder
+cd path/to/BehaviorGuard
+
+# Create the virtual environment
+python -m venv venv
+
+# Activate the virtual environment
+venv\Scripts\activate      # Windows
+source venv/bin/activate   # Linux/macOS
+
+# 2. Install Dependencies
+# Navigate to the web app folder to install its specific requirements
+cd behaviorguard_web
+pip install -r requirements.txt
+
+# Return to the main folder, then install the Risk Engine dependencies
+cd ..
+pip install Flask Flask-Cors numpy pandas scikit-learn tensorflow
+
+# 3. Initialize the Database
+cd behaviorguard_web
+# Run the schema SQL file to initialize your SQLite database
+sqlite3 behaviorguard.db < schema.sql
+cd ..
+
+# 4. Start the Risk Engine Server
+# The Risk Engine must be running for the Web App to get risk scores.
+# Open a NEW terminal window, activate your virtual environment, and run:
+cd path/to/BehaviorGuard/risk_engine
+python "risk_engine (1).py"
+# You should see a console output indicating that the models have loaded.
+
+# 5. Start the Web Application
+# Go back to your FIRST terminal window (where the virtual environment is also active) and run:
+cd path/to/BehaviorGuard/behaviorguard_web
+python app.py
+# Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser to interact with the application!
+
 
 ## 📁 Recommended Directory Structure
 
@@ -40,6 +97,9 @@ pip (Python package installer)
 
 SQLite (Usually comes pre-installed with Python, required for schema.sql)
 
+## 🚀 Quick Start
+<div>
+```bash
 🚀 Step-by-Step Setup Guide
 Step 1: Set Up a Virtual Environment (Recommended)
 To prevent conflicts with other Python projects on your machine, create a virtual environment in your main BehaviorGuard folder.
@@ -118,3 +178,5 @@ python step3_retrain_from_csv.py
 This script will train a new standard scaler, Isolation Forest, and Autoencoder. It will output a models/ directory containing scaler_web.pkl, isolation_forest_web.pkl, autoencoder_web.keras, and autoencoder_threshold_web.npy.
 
 Important: If you use these newly generated files, you will need to open risk_engine (1).py and update the file paths at the top of the script (remove the (3) from the filenames) so the engine loads your new, updated models.
+
+</div>
