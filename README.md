@@ -112,9 +112,6 @@ This script will train a new standard scaler, Isolation Forest, and Autoencoder.
 
 Important: If you use these newly generated files, you will need to open risk_engine (1).py and update the file paths at the top of the script (remove the (3) from the filenames) so the engine loads your new, updated models.
 
-
-
-
 ## 📁 Recommended Directory Structure
 
 Before starting, it is highly recommended to organize your downloaded files into a clean folder structure. Create a main project folder (e.g., `BehaviorGuard`) and organize the unzipped and loose files into two subdirectories exactly like this:
@@ -138,10 +135,13 @@ BehaviorGuard/
 
 (Note: The risk_engine (1).py script explicitly looks for the model files with the (3) in their filenames. Keep the filenames exactly as downloaded unless you plan to edit the risk_engine (1).py code to match cleaner names).
 
+```
 
 ## 📄 License
 
 This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+
 
 
 
