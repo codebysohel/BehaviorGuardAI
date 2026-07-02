@@ -31,8 +31,6 @@ SQLite (Usually comes pre-installed with Python, required for schema.sql)
 
 ## 🚀 Quick Start
 ```bash
-## 🚀 Quick Start
-```bash
 🚀 Step-by-Step Setup Guide
 Step 1: Set Up a Virtual Environment (Recommended)
 To prevent conflicts with other Python projects on your machine, create a virtual environment in your main BehaviorGuard folder.
@@ -98,6 +96,8 @@ cd path/to/BehaviorGuard/behaviorguard_web
 python app.py
 Check the terminal output for the local URL (usually http://127.0.0.1:5000). Open this link in your web browser to interact with the application!
 
+```
+
 🧠 Advanced: Retraining the Models
 If you need to retrain the Risk Engine models with new data in the future, a retraining script has been provided (step3_retrain_from_csv.py).
 
@@ -137,6 +137,11 @@ BehaviorGuard/
     └── autoencoder_threshold_web (2).npy  <-- (Optional backup)
 
 (Note: The risk_engine (1).py script explicitly looks for the model files with the (3) in their filenames. Keep the filenames exactly as downloaded unless you plan to edit the risk_engine (1).py code to match cleaner names).
+
+
+## 📄 License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 
 
