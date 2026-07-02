@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecureBank — Home</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6FB;min-height:100vh;display:flex;flex-direction:column}
+.header{background:#0D2137;height:56px;display:flex;align-items:center;padding:0 28px;gap:10px;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;background:#1A6BFF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{color:#fff;font-size:18px;font-weight:700}
+.header-right{display:flex;align-items:center;gap:14px}
+.user-pill{color:rgba(255,255,255,.7);font-size:13px}
+.logout{color:rgba(255,255,255,.65);font-size:13px;text-decoration:none;padding:5px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+.main{flex:1;padding:28px 24px;max-width:860px;margin:0 auto;width:100%}
+h1{font-size:23px;font-weight:700;color:#0D2137;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.card{background:#fff;border:1px solid #D4DBE8;border-radius:12px;padding:20px}
+.card-label{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:#5A6A7E;margin-bottom:10px}
+/* Risk gauge */
+.gauge-wrap{position:relative;height:12px;background:#F0F2F8;border-radius:6px;overflow:hidden;margin:8px 0}
+.gauge-fill{height:100%;border-radius:6px;transition:width .8s ease}
+.gauge-markers{display:flex;justify-content:space-between;font-size:10px;color:#94A3B8;margin-top:3px}
+.score-num{font-size:36px;font-weight:700;line-height:1;margin-bottom:2px}
+.score-label{font-size:12px}
+.decision-badge{display:inline-block;margin-top:8px;font-size:12px;font-weight:600;padding:4px 14px;border-radius:20px}
+/* Factor breakdown */
+.factor{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:12px}
+.factor-name{min-width:140px;color:#5A6A7E}
+.factor-bar{flex:1;height:5px;background:#F0F2F8;border-radius:3px;overflow:hidden}
+.factor-fill{height:100%;border-radius:3px}
+.factor-val{min-width:36px;text-align:right;font-family:monospace;font-size:11px;color:#1A2233}
+/* History */
+.history-table{width:100%;border-collapse:collapse;font-size:13px}
+.history-table th{font-size:11px;font-weight:600;color:#5A6A7E;text-transform:uppercase;letter-spacing:.04em;padding:8px 10px;text-align:left;border-bottom:1px solid #E8EDF5}
+.history-table td{padding:8px 10px;border-bottom:1px solid #F4F6FB;color:#1A2233}
+.history-table tr:last-child td{border-bottom:none}
+.badge{font-size:11px;padding:2px 10px;border-radius:10px;font-weight:500}
+.allow{background:#ECFDF5;color:#007A52}
+.otp{background:#FFF7ED;color:#B45309}
+.block{background:#FEF3F2;color:#C0392B}
+.full-width{grid-column:1/-1}
+.nav{display:flex;gap:10px;margin-bottom:18px}
+.nav a{font-size:13px;color:#1156AE;text-decoration:none;padding:6px 14px;border:1px solid #BFDBFE;border-radius:8px;font-weight:500}
+.nav a:hover{background:#EFF6FF}
+.flash{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.flash.success{background:#ECFDF5;color:#007A52;border:1px solid #A7F3D0}
+.flash.warning{background:#FFF7ED;color:#B45309;border:1px solid #FDE68A}
+footer{background:#0D2137;color:rgba(255,255,255,.4);font-size:11px;padding:12px 28px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">🛡</div>
+    <span class="logo-text">SecureBank</span>
+  </div>
+  <div class="header-right">
+    <span class="user-pill">{{ username }}</span>
+    <a href="/logout" class="logout">Log Out</a>
+  </div>
+</header>
+
+<div class="main">
+  <h1>Welcome, {{ username }}</h1>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="flash {{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <div class="nav">
+    <a href="/dashboard">📊 Session Dashboard</a>
+    <a href="/logout">🚪 Log Out</a>
+  </div>
+
+  <div class="grid">
+    <!-- Risk Score Card -->
+    <div class="card">
+      <div class="card-label">Behavioral Risk Score</div>
+      {% if risk_score < 0 %}
+        <div class="score-num" style="color:#1156AE">—</div>
+        <div class="score-label" style="color:#5A6A7E">Risk API offline</div>
+        <span class="decision-badge" style="background:#EFF6FF;color:#1156AE">Defaulted to Allow</span>
+      {% else %}
+        <div class="score-num" style="color:{{ color }}">{{ risk_score }}</div>
+        <div class="score-label" style="color:#5A6A7E">out of 100</div>
+
+        <div class="gauge-wrap" style="margin-top:10px">
+          <div class="gauge-fill" style="width:{{ risk_score }}%;background:{{ color }}"></div>
+        </div>
+        <div class="gauge-markers">
+          <span>0</span>
+          <span style="color:{{ '#007A52' if risk_score <= allow_max else '#94A3B8' }}">Allow ≤{{ allow_max }}</span>
+          <span style="color:{{ '#B45309' if allow_max < risk_score <= otp_max else '#94A3B8' }}">OTP ≤{{ otp_max }}</span>
+          <span style="color:{{ '#C0392B' if risk_score > otp_max else '#94A3B8' }}">Block 61+</span>
+          <span>100</span>
+        </div>
+
+        <span class="decision-badge
+          {% if risk_score <= allow_max %}allow
+          {% elif risk_score <= otp_max %}otp
+          {% else %}block{% endif %}"
+        >{{ label }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Scoring Details Card -->
+    <div class="card">
+      <div class="card-label">Scoring Details</div>
+      {% if latency_ms > 0 %}
+        <div style="font-size:12px;color:#5A6A7E;margin-bottom:10px">
+          Response time: <strong style="color:#0D2137">{{ latency_ms|round(1) }} ms</strong>
+        </div>
+      {% endif %}
+
+      {% if factors %}
+        {% if factors.isolation_forest_risk is defined %}
+          <div class="factor">
+            <span class="factor-name">Isolation Forest</span>
+            <div class="factor-bar">
+              <div class="factor-fill" style="width:{{ factors.isolation_forest_risk }}%;background:#1A6BFF"></div>
+            </div>
+            <span class="factor-val">{{ factors.isolation_forest_risk|round(1) }}</span>
+          </div>
+        {% endif %}
+        {% if factors.autoencoder_risk is defined and factors.autoencoder_risk %}
+          <div class="factor">
+            <span class="factor-name">Autoencoder</span>
+            <div class="factor-bar">
+              <div class="factor-fill" style="width:{{ factors.autoencoder_risk }}%;background:#7B5EF5"></div>
+            </div>
+            <span class="factor-val">{{ factors.autoencoder_risk|round(1) }}</span>
+          </div>
+        {% endif %}
+        {% if factors.event_count is defined %}
+          <div style="font-size:11px;color:#94A3B8;margin-top:8px">
+            Events analyzed: {{ factors.event_count }}
+          </div>
+        {% endif %}
+        {% if factors.note is defined %}
+          <div style="font-size:11px;color:#B45309;margin-top:6px">{{ factors.note }}</div>
+        {% endif %}
+      {% else %}
+        <div style="font-size:12px;color:#94A3B8">No factor data available.</div>
+      {% endif %}
+    </div>
+
+    <!-- Login History (full width) -->
+    <div class="card full-width">
+      <div class="card-label" style="margin-bottom:12px">Your Login History</div>
+      {% if history %}
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Risk Score</th>
+              <th>Decision</th>
+              <th>Events</th>
+              <th>Latency</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for h in history %}
+            <tr>
+              <td>{{ h.timestamp.strftime('%b %d, %H:%M') if h.timestamp else '—' }}</td>
+              <td>
+                {% if h.risk_score < 0 %}—
+                {% else %}<strong>{{ h.risk_score|round|int }}</strong>/100
+                {% endif %}
+              </td>
+              <td><span class="badge {{ h.decision }}">{{ h.decision }}</span></td>
+              <td>{{ h.event_count }}</td>
+              <td>{{ h.latency_ms|round(1) if h.latency_ms else '—' }} ms</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div style="color:#94A3B8;font-size:13px">No previous sessions yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<footer>BehaviorGuard AI · All sessions logged · <a href="/dashboard" style="color:rgba(255,255,255,.5)">View Dashboard</a></footer>
+</body>
+</html>

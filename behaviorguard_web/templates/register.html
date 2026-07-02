@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SecureBank — Register</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6FB;min-height:100vh;display:flex;flex-direction:column}
+.header{background:#0D2137;height:56px;display:flex;align-items:center;padding:0 28px;gap:10px}
+.logo{width:30px;height:30px;background:#1A6BFF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{color:#fff;font-size:18px;font-weight:700}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.card{background:#fff;border:1px solid #D4DBE8;border-radius:14px;padding:36px;width:100%;max-width:400px;box-shadow:0 4px 28px rgba(0,0,0,.07)}
+h1{font-size:21px;font-weight:700;color:#0D2137;margin-bottom:24px}
+label{display:block;font-size:12px;font-weight:600;color:#1A2233;margin-bottom:5px}
+input{width:100%;height:46px;border:1.5px solid #D4DBE8;border-radius:8px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:16px}
+input:focus{border-color:#1A6BFF}
+.btn{width:100%;height:48px;background:#1156AE;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn:hover{background:#1A6BFF}
+.back{display:block;text-align:center;margin-top:14px;font-size:13px;color:#1156AE;text-decoration:none}
+.flash{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.flash.error{background:#FEF3F2;color:#C0392B;border:1px solid #FECACA}
+.flash.success{background:#ECFDF5;color:#007A52;border:1px solid #A7F3D0}
+footer{background:#0D2137;color:rgba(255,255,255,.4);font-size:11px;padding:12px 28px;text-align:center}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">🛡</div>
+  <span class="logo-text">SecureBank</span>
+</header>
+<div class="main">
+  <div class="card">
+    <h1>Create Account</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    <form method="POST">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="Choose a username">
+      <label>Password (min 6 characters)</label>
+      <input type="password" name="password" placeholder="Choose a password">
+      <label>Confirm Password</label>
+      <input type="password" name="confirm" placeholder="Repeat your password">
+      <button type="submit" class="btn">Create Account</button>
+    </form>
+    <a href="/" class="back">← Back to Login</a>
+  </div>
+</div>
+<footer>BehaviorGuard AI</footer>
+</body>
+</html>

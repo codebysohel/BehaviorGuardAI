@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SecureBank — Verify OTP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6FB;min-height:100vh;display:flex;flex-direction:column}
+.header{background:#0D2137;height:56px;display:flex;align-items:center;padding:0 28px;gap:10px}
+.logo{width:30px;height:30px;background:#1A6BFF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{color:#fff;font-size:18px;font-weight:700}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.card{background:#fff;border:1px solid #D4DBE8;border-radius:14px;padding:36px;width:100%;max-width:400px;box-shadow:0 4px 28px rgba(0,0,0,.07)}
+h1{font-size:20px;font-weight:700;color:#0D2137;margin-bottom:12px}
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:10px 14px;background:#FFF7ED;border:1px solid #FDE68A;border-radius:8px}
+.score-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;background:#B45309;flex-shrink:0}
+.score-info{font-size:12px;color:#7B4800;line-height:1.6}
+.hint{font-size:12px;color:#1156AE;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;margin-bottom:20px;line-height:1.6}
+label{display:block;font-size:12px;font-weight:600;color:#1A2233;margin-bottom:6px}
+input[type=text]{width:100%;height:58px;border:1.5px solid #D4DBE8;border-radius:8px;padding:0 14px;font-size:24px;font-family:monospace;letter-spacing:8px;text-align:center;outline:none}
+input[type=text]:focus{border-color:#1A6BFF;box-shadow:0 0 0 3px rgba(26,107,255,.1)}
+.btn{width:100%;height:48px;background:#1156AE;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:14px}
+.btn:hover{background:#1A6BFF}
+.flash{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px}
+.flash.error{background:#FEF3F2;color:#C0392B;border:1px solid #FECACA}
+footer{background:#0D2137;color:rgba(255,255,255,.4);font-size:11px;padding:12px 28px;text-align:center}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="logo">🛡</div>
+  <span class="logo-text">SecureBank</span>
+</header>
+<div class="main">
+  <div class="card">
+    <h1>Additional Verification Required</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="score-row">
+      <div class="score-circle">{{ risk_score if risk_score >= 0 else '?' }}</div>
+      <div class="score-info">
+        <strong>Behavioral risk score: {{ risk_score if risk_score >= 0 else 'N/A' }}/100</strong><br>
+        Your typing and mouse patterns look slightly unusual this session.
+        Please confirm your identity with a one-time password.
+      </div>
+    </div>
+
+    <div class="hint">
+      <strong>Demo OTP: 123456</strong><br>
+      In production, this code would be sent to your registered mobile number via SMS.
+    </div>
+
+    <form method="POST" action="/verify-otp">
+      <label>Enter One-Time Password</label>
+      <input type="text" name="otp" maxlength="6"
+             placeholder="——————" autofocus autocomplete="off">
+      <button type="submit" class="btn">Verify Identity →</button>
+    </form>
+  </div>
+</div>
+<footer>BehaviorGuard AI · Step-up Authentication</footer>
+</body>
+</html>

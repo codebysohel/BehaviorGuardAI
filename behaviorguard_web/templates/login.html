@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecureBank — Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6FB;min-height:100vh;display:flex;flex-direction:column}
+.header{background:#0D2137;height:56px;display:flex;align-items:center;padding:0 28px;gap:10px}
+.logo{width:30px;height:30px;background:#1A6BFF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{color:#fff;font-size:18px;font-weight:700}
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px}
+.card{background:#fff;border:1px solid #D4DBE8;border-radius:14px;padding:36px;width:100%;max-width:400px;box-shadow:0 4px 28px rgba(0,0,0,.07)}
+h1{font-size:21px;font-weight:700;color:#0D2137;margin-bottom:4px}
+.sub{font-size:13px;color:#5A6A7E;margin-bottom:28px}
+label{display:block;font-size:12px;font-weight:600;color:#1A2233;margin-bottom:5px}
+input[type=text],input[type=password]{width:100%;height:46px;border:1.5px solid #D4DBE8;border-radius:8px;padding:0 14px;font-size:14px;font-family:inherit;outline:none;transition:border-color .15s;margin-bottom:16px}
+input:focus{border-color:#1A6BFF;box-shadow:0 0 0 3px rgba(26,107,255,.1)}
+.btn{width:100%;height:48px;background:#1156AE;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-top:4px}
+.btn:hover{background:#1A6BFF}
+.btn:disabled{background:#94A3B8;cursor:not-allowed}
+.link{text-align:center;margin-top:14px;font-size:13px;color:#5A6A7E}
+.link a{color:#1156AE;text-decoration:none;font-weight:500}
+.flash{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;line-height:1.5}
+.flash.error{background:#FEF3F2;color:#C0392B;border:1px solid #FECACA}
+.flash.success{background:#ECFDF5;color:#007A52;border:1px solid #A7F3D0}
+.flash.info{background:#EFF6FF;color:#1156AE;border:1px solid #BFDBFE}
+.status{margin-top:14px;padding:10px 14px;border-radius:8px;font-size:12px;font-weight:500;background:#FFF7ED;color:#B45309;border:1px solid #FDE68A;display:flex;align-items:center;gap:8px}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.demo-hint{margin-top:20px;padding:12px 14px;background:#F8FAFF;border:1px solid #E0E8FF;border-radius:8px;font-size:12px;color:#5A6A7E;line-height:1.7}
+footer{background:#0D2137;color:rgba(255,255,255,.4);font-size:11px;padding:12px 28px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">🛡</div>
+  <span class="logo-text">SecureBank</span>
+</header>
+
+<div class="main">
+  <div class="card">
+    <h1>Internet Banking</h1>
+    <p class="sub">Sign in to your SecureBank account</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form id="loginForm" method="POST" action="/login">
+      <input type="hidden" name="events" id="eventsInput" value="[]">
+
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username"
+             placeholder="Enter your username" autocomplete="off" spellcheck="false">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password"
+             placeholder="Enter your password">
+
+      <button type="submit" class="btn" id="loginBtn">Secure Login →</button>
+    </form>
+
+    <div class="status">
+      <span class="dot"></span>
+      <span id="statusText">Recording behavioral signals…</span>
+    </div>
+
+    <div class="link">
+      New user? <a href="/register">Create account</a>
+    </div>
+
+    <div class="demo-hint">
+      <strong>Demo accounts:</strong><br>
+      Username: <strong>alice</strong> or <strong>bob</strong> &nbsp;·&nbsp;
+      Password: <strong>Test@1234</strong>
+    </div>
+  </div>
+</div>
+
+<footer>BehaviorGuard AI · Behavioral Authentication System</footer>
+
+<script>
+// ── Behavioral signal collection ─────────────────────────────────────────────
+const events = [];
+let count = 0;
+
+document.addEventListener('keydown',   e => capture({type:'kd', key:e.key,       ts:+new Date()}));
+document.addEventListener('keyup',     e => capture({type:'ku', key:e.key,       ts:+new Date()}));
+document.addEventListener('mousemove', e => capture({type:'mm', x:e.clientX, y:e.clientY, ts:+new Date()}));
+document.addEventListener('click',     e => capture({type:'cl', x:e.clientX, y:e.clientY, ts:+new Date()}));
+document.addEventListener('scroll',    () => capture({type:'sc', ts:+new Date()}));
+
+function capture(evt) {
+  events.push(evt);
+  count++;
+  if (count % 25 === 0) {
+    document.getElementById('statusText').textContent =
+      `Recording… ${count} behavioral events captured`;
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', function() {
+  document.getElementById('eventsInput').value = JSON.stringify(events);
+  const btn = document.getElementById('loginBtn');
+  btn.disabled    = true;
+  btn.textContent = 'Verifying…';
+  document.getElementById('statusText').textContent =
+    `Sending ${count} events to risk engine…`;
+});
+</script>
+</body>
+</html>

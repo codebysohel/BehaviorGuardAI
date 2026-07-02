@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecureBank — Live Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F4F6FB;min-height:100vh;display:flex;flex-direction:column}
+.header{background:#0D2137;height:56px;display:flex;align-items:center;padding:0 28px;gap:10px;justify-content:space-between}
+.header-left{display:flex;align-items:center;gap:10px}
+.logo{width:30px;height:30px;background:#1A6BFF;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{color:#fff;font-size:18px;font-weight:700}
+.header-right{display:flex;align-items:center;gap:12px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#00D084;animation:pulse 1.5s infinite;flex-shrink:0}
+.live-text{color:rgba(255,255,255,.7);font-size:12px}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+.back{color:rgba(255,255,255,.65);font-size:13px;text-decoration:none;padding:5px 14px;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+.main{flex:1;padding:24px;max-width:1100px;margin:0 auto;width:100%}
+h1{font-size:20px;font-weight:700;color:#0D2137;margin-bottom:6px}
+.sub{font-size:13px;color:#5A6A7E;margin-bottom:20px}
+
+/* Stats strip */
+.stats-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border:1px solid #D4DBE8;border-radius:10px;padding:14px 16px;text-align:center}
+.stat-num{font-size:28px;font-weight:700;line-height:1;margin-bottom:3px}
+.stat-label{font-size:11px;color:#5A6A7E;text-transform:uppercase;letter-spacing:.04em}
+
+/* Session table */
+.table-card{background:#fff;border:1px solid #D4DBE8;border-radius:12px;overflow:hidden}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #E8EDF5}
+.table-title{font-size:13px;font-weight:600;color:#0D2137}
+.refresh-badge{font-size:11px;color:#5A6A7E;background:#F4F6FB;padding:3px 10px;border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-size:11px;font-weight:600;color:#5A6A7E;text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;text-align:left;border-bottom:1px solid #E8EDF5;background:#FAFBFD}
+td{padding:10px 16px;border-bottom:1px solid #F4F6FB;color:#1A2233;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FAFBFD}
+
+/* Risk bar in table */
+.risk-bar-wrap{display:flex;align-items:center;gap:8px}
+.risk-mini-bar{width:80px;height:6px;background:#F0F2F8;border-radius:3px;overflow:hidden;flex-shrink:0}
+.risk-mini-fill{height:100%;border-radius:3px}
+.risk-num{font-size:12px;font-family:monospace;font-weight:600;min-width:36px}
+
+/* Badges */
+.badge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500;white-space:nowrap}
+.allow{background:#ECFDF5;color:#007A52}
+.otp{background:#FFF7ED;color:#B45309}
+.block{background:#FEF3F2;color:#C0392B}
+
+.new-row{animation:highlight .8s ease}
+@keyframes highlight{0%{background:#FFF9E6}100%{background:transparent}}
+
+#lastUpdated{font-size:11px;color:#94A3B8;margin-top:8px;text-align:right}
+footer{background:#0D2137;color:rgba(255,255,255,.4);font-size:11px;padding:12px 28px;text-align:center}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-left">
+    <div class="logo">🛡</div>
+    <span class="logo-text">SecureBank — Live Dashboard</span>
+  </div>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <span class="live-text">Auto-refreshing every 5s</span>
+    <a href="/home" class="back">← Home</a>
+  </div>
+</header>
+
+<div class="main">
+  <h1>Session Dashboard</h1>
+  <p class="sub">Live view of all login attempts. Updates automatically.</p>
+
+  <!-- Stats strip -->
+  <div class="stats-strip" id="statsStrip">
+    <div class="stat-card">
+      <div class="stat-num" style="color:#0D2137" id="statTotal">{{ stats.total or 0 }}</div>
+      <div class="stat-label">Total Sessions</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#007A52" id="statAllowed">{{ stats.allowed or 0 }}</div>
+      <div class="stat-label">Allowed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#B45309" id="statOtp">{{ stats.otp or 0 }}</div>
+      <div class="stat-label">OTP Step-up</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#C0392B" id="statBlocked">{{ stats.blocked or 0 }}</div>
+      <div class="stat-label">Blocked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:#1156AE" id="statAvgScore">
+        {{ stats.avg_score|round(1) if stats.avg_score else '—' }}
+      </div>
+      <div class="stat-label">Avg Risk Score</div>
+    </div>
+  </div>
+
+  <!-- Session table -->
+  <div class="table-card">
+    <div class="table-header">
+      <span class="table-title">Recent Login Sessions (last 50)</span>
+      <span class="refresh-badge" id="refreshBadge">Refreshing…</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Risk Score</th>
+          <th>Decision</th>
+          <th>Events</th>
+          <th>Latency</th>
+        </tr>
+      </thead>
+      <tbody id="sessionTableBody">
+        {% for s in sessions %}
+        <tr>
+          <td>{{ s.timestamp.strftime('%b %d, %H:%M:%S') if s.timestamp else '—' }}</td>
+          <td><strong>{{ s.username }}</strong></td>
+          <td>
+            {% if s.risk_score < 0 %}
+              <span style="color:#94A3B8">—</span>
+            {% else %}
+              <div class="risk-bar-wrap">
+                <div class="risk-mini-bar">
+                  <div class="risk-mini-fill" style="width:{{ s.risk_score }}%;background:
+                    {% if s.risk_score <= 30 %}#007A52
+                    {% elif s.risk_score <= 60 %}#B45309
+                    {% else %}#C0392B{% endif %}">
+                  </div>
+                </div>
+                <span class="risk-num" style="color:
+                  {% if s.risk_score <= 30 %}#007A52
+                  {% elif s.risk_score <= 60 %}#B45309
+                  {% else %}#C0392B{% endif %}">
+                  {{ s.risk_score|round|int }}
+                </span>
+              </div>
+            {% endif %}
+          </td>
+          <td><span class="badge {{ s.decision }}">{{ s.decision }}</span></td>
+          <td>{{ s.event_count }}</td>
+          <td>{{ s.latency_ms|round(1) if s.latency_ms else '—' }} ms</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div id="lastUpdated" style="padding:8px 16px">—</div>
+  </div>
+</div>
+
+<footer>BehaviorGuard AI · Real-time Session Monitor</footer>
+
+<script>
+// ── Auto-refresh every 5 seconds ──────────────────────────────────────────────
+let knownCount = {{ sessions|length }};
+
+function riskColor(score) {
+  if (score < 0)    return '#94A3B8';
+  if (score <= 30)  return '#007A52';
+  if (score <= 60)  return '#B45309';
+  return '#C0392B';
+}
+
+function decisionClass(d) {
+  if (d === 'allow') return 'allow';
+  if (d === 'otp')   return 'otp';
+  return 'block';
+}
+
+async function refresh() {
+  try {
+    const resp = await fetch('/api/live-stats');
+    if (!resp.ok) return;
+    const data = await resp.json();
+
+    // Update stats
+    document.getElementById('statTotal').textContent   = data.stats.total   || 0;
+    document.getElementById('statAllowed').textContent = data.stats.allowed  || 0;
+    document.getElementById('statOtp').textContent     = data.stats.otp      || 0;
+    document.getElementById('statBlocked').textContent = data.stats.blocked  || 0;
+    document.getElementById('statAvgScore').textContent =
+      data.stats.avg_score ? parseFloat(data.stats.avg_score).toFixed(1) : '—';
+
+    // Rebuild table body
+    const tbody = document.getElementById('sessionTableBody');
+    tbody.innerHTML = data.sessions.map((s, i) => {
+      const score      = s.risk_score;
+      const color      = riskColor(score);
+      const scoreHtml  = score < 0
+        ? '<span style="color:#94A3B8">—</span>'
+        : `<div class="risk-bar-wrap">
+             <div class="risk-mini-bar">
+               <div class="risk-mini-fill" style="width:${score}%;background:${color}"></div>
+             </div>
+             <span class="risk-num" style="color:${color}">${Math.round(score)}</span>
+           </div>`;
+      const isNew = i === 0 && data.sessions.length > knownCount;
+      return `<tr class="${isNew ? 'new-row' : ''}">
+        <td>${s.timestamp || '—'}</td>
+        <td><strong>${s.username}</strong></td>
+        <td>${scoreHtml}</td>
+        <td><span class="badge ${decisionClass(s.decision)}">${s.decision}</span></td>
+        <td>${s.event_count}</td>
+        <td>${s.latency_ms ? parseFloat(s.latency_ms).toFixed(1) : '—'} ms</td>
+      </tr>`;
+    }).join('');
+
+    knownCount = data.sessions.length;
+
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent =
+      `Last updated: ${now.toLocaleTimeString()}`;
+    document.getElementById('refreshBadge').textContent = 'Live ●';
+    document.getElementById('refreshBadge').style.color = '#007A52';
+
+  } catch(e) {
+    document.getElementById('refreshBadge').textContent = 'Offline';
+    document.getElementById('refreshBadge').style.color = '#C0392B';
+  }
+}
+
+// Refresh every 5 seconds
+setInterval(refresh, 5000);
+refresh();
+</script>
+</body>
+</html>
