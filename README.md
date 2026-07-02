@@ -17,77 +17,6 @@ This project consists of:
 2. **The Web Application (Frontend):** A Python-based application that interfaces with the user, collects data, interacts with a database, and queries the Risk Engine for decision-making.
 
 ---
-
-
-
----
-
-## 🚀 Quick Start
-
-```bash
-# 1. Set Up a Virtual Environment (Recommended)
-# Navigate to your project folder
-cd path/to/BehaviorGuard
-
-# Create the virtual environment
-python -m venv venv
-
-# Activate the virtual environment
-venv\Scripts\activate      # Windows
-source venv/bin/activate   # Linux/macOS
-
-# 2. Install Dependencies
-# Navigate to the web app folder to install its specific requirements
-cd behaviorguard_web
-pip install -r requirements.txt
-
-# Return to the main folder, then install the Risk Engine dependencies
-cd ..
-pip install Flask Flask-Cors numpy pandas scikit-learn tensorflow
-
-# 3. Initialize the Database
-cd behaviorguard_web
-# Run the schema SQL file to initialize your SQLite database
-sqlite3 behaviorguard.db < schema.sql
-cd ..
-
-# 4. Start the Risk Engine Server
-# The Risk Engine must be running for the Web App to get risk scores.
-# Open a NEW terminal window, activate your virtual environment, and run:
-cd path/to/BehaviorGuard/risk_engine
-python "risk_engine (1).py"
-# You should see a console output indicating that the models have loaded.
-
-# 5. Start the Web Application
-# Go back to your FIRST terminal window (where the virtual environment is also active) and run:
-cd path/to/BehaviorGuard/behaviorguard_web
-python app.py
-# Open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your web browser to interact with the application!
-
-
-## 📁 Recommended Directory Structure
-
-Before starting, it is highly recommended to organize your downloaded files into a clean folder structure. Create a main project folder (e.g., `BehaviorGuard`) and organize the unzipped and loose files into two subdirectories exactly like this:
-
-```text
-BehaviorGuard/
-├── behaviorguard_web/
-│   ├── app.py
-│   ├── database.py
-│   ├── requirements.txt
-│   ├── schema.sql
-│   └── README.txt
-└── risk_engine/
-    ├── risk_engine (1).py
-    ├── step3_retrain_from_csv.py
-    ├── scaler_web (3).pkl
-    ├── isolation_forest_web (3).pkl
-    ├── autoencoder_web (3).keras
-    ├── autoencoder_threshold_web (3).npy
-    └── autoencoder_threshold_web (2).npy  <-- (Optional backup)
-
-(Note: The risk_engine (1).py script explicitly looks for the model files with the (3) in their filenames. Keep the filenames exactly as downloaded unless you plan to edit the risk_engine (1).py code to match cleaner names).
-
 🛠️ Prerequisites
 Ensure you have the following installed on your system:
 
@@ -97,8 +26,12 @@ pip (Python package installer)
 
 SQLite (Usually comes pre-installed with Python, required for schema.sql)
 
+
+---
+
 ## 🚀 Quick Start
-<div>
+```bash
+## 🚀 Quick Start
 ```bash
 🚀 Step-by-Step Setup Guide
 Step 1: Set Up a Virtual Environment (Recommended)
@@ -179,4 +112,31 @@ This script will train a new standard scaler, Isolation Forest, and Autoencoder.
 
 Important: If you use these newly generated files, you will need to open risk_engine (1).py and update the file paths at the top of the script (remove the (3) from the filenames) so the engine loads your new, updated models.
 
-</div>
+
+
+
+## 📁 Recommended Directory Structure
+
+Before starting, it is highly recommended to organize your downloaded files into a clean folder structure. Create a main project folder (e.g., `BehaviorGuard`) and organize the unzipped and loose files into two subdirectories exactly like this:
+
+```text
+BehaviorGuard/
+├── behaviorguard_web/
+│   ├── app.py
+│   ├── database.py
+│   ├── requirements.txt
+│   ├── schema.sql
+│   └── README.txt
+└── risk_engine/
+    ├── risk_engine (1).py
+    ├── step3_retrain_from_csv.py
+    ├── scaler_web (3).pkl
+    ├── isolation_forest_web (3).pkl
+    ├── autoencoder_web (3).keras
+    ├── autoencoder_threshold_web (3).npy
+    └── autoencoder_threshold_web (2).npy  <-- (Optional backup)
+
+(Note: The risk_engine (1).py script explicitly looks for the model files with the (3) in their filenames. Keep the filenames exactly as downloaded unless you plan to edit the risk_engine (1).py code to match cleaner names).
+
+
+
